@@ -51,7 +51,7 @@
     function updatePointer() {
       var size = sizeSlider.value;
       var alphaThreshold = alphaThresholdSlider.value;
-      var pointerImage = Croquis.getBrushPointer(
+      var pointerImage = Croquis.createAlphaThresholdBorder(
         (currentBrush == circleBrush)? null : currentBrush,
         size, alphaThreshold, true);
       pointerContainer.innerHTML = '';
