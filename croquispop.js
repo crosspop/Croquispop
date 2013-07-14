@@ -102,7 +102,7 @@ function updatePointer() {
     else {
         threshold = 0x30;
     }
-    var brushPointer = Croquis.createAlphaThresholdBorder(
+    var brushPointer = Croquis.createBrushPointer(
         image, croquis.getToolSize(), threshold, true);
     brushPointer.style.setProperty('margin-left',
         '-' + (brushPointer.width * 0.5) + 'px');
