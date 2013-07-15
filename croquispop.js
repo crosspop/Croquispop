@@ -11,7 +11,7 @@ croquis.setToolSize(40);
 croquis.setToolColor('#000');
 croquis.setToolStabilizeLevel(10);
 croquis.setToolStabilizeWeight(0.5);
-croquis.setBrushInterval(0);
+croquis.setBrushSpacing(0);
 croquis.unlockHistory();
 var croquisDOMElement = croquis.getDOMElement();
 var canvasArea = document.getElementById('canvas-area');
@@ -209,11 +209,11 @@ var selectEraserCheckbox =
 var brushSizeSlider = document.getElementById('brush-size-slider');
 var brushOpacitySlider = document.getElementById('brush-opacity-slider');
 var brushFlowSlider = document.getElementById('brush-flow-slider');
-var brushIntervalSlider = document.getElementById('brush-interval-slider');
+var brushSpacingSlider = document.getElementById('brush-spacing-slider');
 brushSizeSlider.value = croquis.getToolSize();
 brushOpacitySlider.value = croquis.getToolOpacity() * 100;
 brushFlowSlider.value = croquis.getBrushFlow() * 100;
-brushIntervalSlider.value = croquis.getBrushInterval() * 100;
+brushSpacingSlider.value = croquis.getBrushSpacing() * 100;
 
 toolStabilizeLevelSlider.onchange = function () {
     croquis.setToolStabilizeLevel(toolStabilizeLevelSlider.value);
@@ -238,8 +238,8 @@ brushOpacitySlider.onchange = function () {
 brushFlowSlider.onchange = function () {
     croquis.setBrushFlow(brushFlowSlider.value * 0.01);
 }
-brushIntervalSlider.onchange = function () {
-    croquis.setBrushInterval(brushIntervalSlider.value * 0.01);
+brushSpacingSlider.onchange = function () {
+    croquis.setBrushSpacing(brushSpacingSlider.value * 0.01);
 }
 
 // Platform variables
