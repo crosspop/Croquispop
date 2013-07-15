@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Croquispop</title>
+    <link rel="stylesheet" type="text/css" href="./croquispop.css">
+    <link rel="stylesheet" type="text/css"
+          href="http://fonts.googleapis.com/earlyaccess/nanumgothic.css">
+  </head>
+  <body>
+    <div id="brush-image-shelf">
+      <div class="brush-image on" id="circle-brush"></div>
+      <img src="./img/brush/b0.png" class="brush-image"></img>
+      <img src="./img/brush/b1.png" class="brush-image"></img>
+      <img src="./img/brush/b2.png" class="brush-image"></img>
+      <img src="./img/brush/b3.png" class="brush-image"></img>
+      <img src="./img/brush/b4.png" class="brush-image"></img>
+    </div>
+    <br>
+    <span>Preview: </span>
+    <div id="canvas-area"></div>
+    <br>
+    <span>Size: </span>
+    <input id="size-slider" type="range" min="0" max="100">
+    <br>
+    <span>Flow: </span>
+    <input id="flow-slider" type="range" min="0" max="100">
+    <br>
+    <span>Spacing: </span>
+    <input id="spacing-slider" type="range" min="0" max="500">
+    <br>
+    <span>Alpha threshold: </span>
+    <input id="alpha-threshold-slider" type="range" min="1" max="255">
+    <script src="./croquis.js/croquis.js"></script>
+    <br>
+    <span>Pointer: </span>
+    <div id="pointer-container" style="display: inline;"></div>
+    <script>
+    // <![CDATA[
+    var w = 300;
+    var h = 150;
+
+    var croquis = new Croquis();
+    croquis.lockHistory(); //not using history
+    croquis.setCanvasSize(w, h);
+    croquis.addLayer();
+    croquis.selectLayer(0);
+    croquis.fillLayer('#fff');
+    croquis.addLayer();
+    croquis.selectLayer(1);
+    croquis.setTool('brush');
+    croquis.setToolSize(40);
+    croquis.setToolColor('#000');
+    croquis.setBrushFlow(1);
+    croquis.setToolStabilizeLevel(0); //not using stabilizer
+    croquis.setBrushSpacing(0);
+
+    var croquisDOMElement = croquis.getDOMElement();
+    var canvasArea = document.getElementById('canvas-area');
+    canvasArea.appendChild(croquisDOMElement);
+
+    var pointerContainer = document.getElementById('pointer-container');
+    var sizeSlider = document.getElementById('size-slider');
+    var flowSlider = document.getElementById('flow-slider');
+    var spacingSlider = document.getElementById('spacing-slider');
+    var alphaThresholdSlider = document.getElementById('alpha-threshold-slider');
+
+    sizeSlider.value = croquis.getToolSize();
+    flowSlider.value = croquis.getBrushFlow() * 100;
+    spacingSlider.value = croquis.getBrushSpacing() * 100;
+    alphaThresholdSlider.value = 0x20;
+    
+    sizeSlider.onchange = function () {
+      croquis.setToolSize(sizeSlider.value);
+      updatePointer();
+      updatePreview();
+    };
+    flowSlider.onchange = function () {
+      croquis.setBrushFlow(flowSlider.value * 0.01);
+      updatePreview();
+    };
+    spacingSlider.onchange = function () {
+      croquis.setBrushSpacing(spacingSlider.value * 0.01);
+      updatePreview();
+    };
+    alphaThresholdSlider.onchange = function () {
+      updatePointer();
+      updatePreview();
+    };
+
+    var circleBrush = document.getElementById('circle-brush');
+    var brushImages = document.getElementsByClassName('brush-image');
+    var currentBrush = circleBrush;
+    Array.prototype.map.call(brushImages, function (brush) {
+      brush.addEventListener('mousedown', brushImageMouseDown);
+    });
+    function brushImageMouseDown(e) {
+      var image = e.currentTarget;
+      image.className = 'brush-image on';
+      currentBrush.className = 'brush-image';
+      currentBrush = image;
+      croquis.setBrushImage((image == circleBrush)? null : image);
+      updatePointer();
+      updatePreview();
+    }
+
+    function updatePointer() {
+      var size = sizeSlider.value;
+      var alphaThreshold = alphaThresholdSlider.value;
+      var pointerImage = Croquis.createBrushPointer(
+        croquis.getBrushImage(), size, alphaThreshold, true);
+      pointerContainer.innerHTML = '';
+      pointerContainer.appendChild(pointerImage);
+    }
+
+    function updatePreview() {
+      var deg360 = Math.PI * 2;
+      var deg180 = Math.PI;
+      var halfH = h >> 1;
+      var padding = 50;
+      var paddedWidth = w - padding * 2;
+      var amplitude = halfH - padding;
+      croquis.clearLayer();
+      croquis.down(padding, halfH, 0);
+      for (var t = 0; t < 1; t += 0.01) {
+        var horizontalPos = t * paddedWidth + padding;
+        var verticalPos = Math.sin(deg360 * t) * amplitude + halfH;
+        var pressure = Math.sin(deg180 * t);
+        croquis.move(horizontalPos, verticalPos, pressure);
+      }
+      croquis.up(w - padding, halfH, 0);
+    }
+
+    updatePointer();
+    updatePreview();
+    // ]]>
+    </script>
+  </body>
+</html>
