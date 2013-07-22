@@ -44,16 +44,15 @@
     croquis.lockHistory(); //not using history
     croquis.setCanvasSize(w, h);
     croquis.addLayer();
-    croquis.selectLayer(0);
     croquis.fillLayer('#fff');
     croquis.addLayer();
     croquis.selectLayer(1);
-    croquis.setTool('brush');
-    croquis.setToolSize(40);
-    croquis.setToolColor('#000');
-    croquis.setBrushFlow(1);
+    var brush = new Croquis.Brush();
+    brush.setSize(40);
+    brush.setColor('#000');
+    brush.setSpacing(0);
+    croquis.setTool(brush);
     croquis.setToolStabilizeLevel(0); //not using stabilizer
-    croquis.setBrushSpacing(0);
 
     var croquisDOMElement = croquis.getDOMElement();
     var canvasArea = document.getElementById('canvas-area');
@@ -65,22 +64,22 @@
     var spacingSlider = document.getElementById('spacing-slider');
     var alphaThresholdSlider = document.getElementById('alpha-threshold-slider');
 
-    sizeSlider.value = croquis.getToolSize();
-    flowSlider.value = croquis.getBrushFlow() * 100;
-    spacingSlider.value = croquis.getBrushSpacing() * 100;
+    sizeSlider.value = brush.getSize();
+    flowSlider.value = brush.getFlow() * 100;
+    spacingSlider.value = brush.getSpacing() * 100;
     alphaThresholdSlider.value = 0x20;
     
     sizeSlider.onchange = function () {
-      croquis.setToolSize(sizeSlider.value);
+      brush.setSize(sizeSlider.value);
       updatePointer();
       updatePreview();
     };
     flowSlider.onchange = function () {
-      croquis.setBrushFlow(flowSlider.value * 0.01);
+      brush.setFlow(flowSlider.value * 0.01);
       updatePreview();
     };
     spacingSlider.onchange = function () {
-      croquis.setBrushSpacing(spacingSlider.value * 0.01);
+      brush.setSpacing(spacingSlider.value * 0.01);
       updatePreview();
     };
     alphaThresholdSlider.onchange = function () {
@@ -99,7 +98,7 @@
       image.className = 'brush-image on';
       currentBrush.className = 'brush-image';
       currentBrush = image;
-      croquis.setBrushImage((image == circleBrush)? null : image);
+      brush.setImage((image == circleBrush)? null : image);
       updatePointer();
       updatePreview();
     }
@@ -108,7 +107,7 @@
       var size = sizeSlider.value;
       var alphaThreshold = alphaThresholdSlider.value;
       var pointerImage = Croquis.createBrushPointer(
-        croquis.getBrushImage(), size, alphaThreshold, true);
+        brush.getImage(), size, alphaThreshold, true);
       pointerContainer.innerHTML = '';
       pointerContainer.appendChild(pointerImage);
     }

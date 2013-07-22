@@ -6,13 +6,17 @@ croquis.addLayer();
 croquis.fillLayer('#fff');
 croquis.addLayer();
 croquis.selectLayer(1);
-croquis.setTool('brush');
-croquis.setToolSize(40);
-croquis.setToolColor('#000');
+croquis.unlockHistory();
+
+var brush = new Croquis.Brush();
+brush.setSize(40);
+brush.setColor('#000');
+brush.setSpacing(0);
+
+croquis.setTool(brush);
 croquis.setToolStabilizeLevel(10);
 croquis.setToolStabilizeWeight(0.5);
-croquis.setBrushSpacing(0);
-croquis.unlockHistory();
+
 var croquisDOMElement = croquis.getDOMElement();
 var canvasArea = document.getElementById('canvas-area');
 canvasArea.appendChild(croquisDOMElement);
@@ -21,6 +25,7 @@ function canvasMouseDown(e) {
     canvasArea.style.setProperty('cursor', 'none');
     croquis.down(mousePosition.x, mousePosition.y);
     document.addEventListener('mousemove', canvasMouseMove);
+    document.addEventListener('mouseup', canvasMouseUp);
 }
 function canvasMouseMove(e) {
     var mousePosition = getRelativePosition(e.clientX, e.clientY);
@@ -31,13 +36,13 @@ function canvasMouseUp(e) {
     canvasArea.style.setProperty('cursor', 'crosshair');
     croquis.up(mousePosition.x, mousePosition.y);
     document.removeEventListener('mousemove', canvasMouseMove);
+    document.removeEventListener('mouseup', canvasMouseUp);
 }
 function getRelativePosition(absoluteX, absoluteY) {
     var rect = croquisDOMElement.getBoundingClientRect();
     return {x: absoluteX - rect.left, y: absoluteY - rect.top};
 }
 croquisDOMElement.addEventListener('mousedown', canvasMouseDown);
-document.addEventListener('mouseup', canvasMouseUp);
 
 //clear & fill button ui
 var clearButton = document.getElementById('clear-button');
@@ -48,7 +53,7 @@ var fillButton = document.getElementById('fill-button');
 fillButton.onclick = function () {
     var rgb = tinycolor(croquis.getToolColor()).toRgb();
     croquis.fillLayer(tinycolor({r: rgb.r, g: rgb.g, b: rgb.b,
-        a: croquis.getToolOpacity()}).toRgbString());
+        a: croquis.getPaintingOpacity()}).toRgbString());
 }
 
 //brush images
@@ -67,7 +72,7 @@ function brushImageMouseDown(e) {
     currentBrush = image;
     if (image == circleBrush)
         image = null;
-    croquis.setBrushImage(image);
+    brush.setImage(image);
     updatePointer();
 }
 
@@ -103,7 +108,7 @@ function updatePointer() {
         threshold = 0x30;
     }
     var brushPointer = Croquis.createBrushPointer(
-        image, croquis.getToolSize(), threshold, true);
+        image, brush.getSize(), threshold, true);
     brushPointer.style.setProperty('margin-left',
         '-' + (brushPointer.width * 0.5) + 'px');
     brushPointer.style.setProperty('margin-top',
@@ -119,7 +124,7 @@ var colorPickerHueSlider =
 var colorPickerSb = document.getElementById('color-picker-sb');
 var colorPickerSaturate = document.getElementById('color-picker-saturate');
 var colorPickerThumb = document.getElementById('color-picker-thumb');
-colorPickerHueSlider.value = tinycolor(croquis.getToolColor()).toHsv().h;
+colorPickerHueSlider.value = tinycolor(brush.getColor()).toHsv().h;
 
 function setColor() {
     var halfThumbRadius = 7.5;
@@ -131,8 +136,8 @@ function setColor() {
         colorPickerThumb.style.getPropertyValue('margin-top'));
     s = (s + halfThumbRadius) / sbSize;
     b = 1 - ((b + halfThumbRadius + sbSize) / sbSize);
-    croquis.setToolColor(tinycolor({h: h, s:s, v: b}).toRgbString());
-    var a = croquis.getToolOpacity();
+    brush.setColor(tinycolor({h: h, s:s, v: b}).toRgbString());
+    var a = croquis.getPaintingOpacity();
     var color = tinycolor({h: h, s:s, v: b, a: a});
     colorPickerColor.style.backgroundColor = color.toRgbString();
     colorPickerColor.textContent = color.toHexString();
@@ -210,10 +215,10 @@ var brushSizeSlider = document.getElementById('brush-size-slider');
 var brushOpacitySlider = document.getElementById('brush-opacity-slider');
 var brushFlowSlider = document.getElementById('brush-flow-slider');
 var brushSpacingSlider = document.getElementById('brush-spacing-slider');
-brushSizeSlider.value = croquis.getToolSize();
-brushOpacitySlider.value = croquis.getToolOpacity() * 100;
-brushFlowSlider.value = croquis.getBrushFlow() * 100;
-brushSpacingSlider.value = croquis.getBrushSpacing() * 100;
+brushSizeSlider.value = brush.getSize();
+brushOpacitySlider.value = croquis.getPaintingOpacity() * 100;
+brushFlowSlider.value = brush.getFlow() * 100;
+brushSpacingSlider.value = brush.getSpacing() * 100;
 
 toolStabilizeLevelSlider.onchange = function () {
     croquis.setToolStabilizeLevel(toolStabilizeLevelSlider.value);
@@ -225,21 +230,21 @@ toolStabilizeWeightSlider.onchange = function () {
 }
 
 selectEraserCheckbox.onchange = function () {
-    croquis.setTool(selectEraserCheckbox.checked? 'eraser' : 'brush');
+    croquis.setPaintingKnockout(selectEraserCheckbox.checked);
 }
 brushSizeSlider.onchange = function () {
-    croquis.setToolSize(brushSizeSlider.value);
+    brush.setSize(brushSizeSlider.value);
     updatePointer();
 }
 brushOpacitySlider.onchange = function () {
-    croquis.setToolOpacity(brushOpacitySlider.value * 0.01);
+    croquis.setPaintingOpacity(brushOpacitySlider.value * 0.01);
     setColor();
 }
 brushFlowSlider.onchange = function () {
-    croquis.setBrushFlow(brushFlowSlider.value * 0.01);
+    brush.setFlow(brushFlowSlider.value * 0.01);
 }
 brushSpacingSlider.onchange = function () {
-    croquis.setBrushSpacing(brushSpacingSlider.value * 0.01);
+    brush.setSpacing(brushSpacingSlider.value * 0.01);
 }
 
 // Platform variables
