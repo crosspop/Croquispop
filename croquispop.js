@@ -51,7 +51,7 @@ clearButton.onclick = function () {
 }
 var fillButton = document.getElementById('fill-button');
 fillButton.onclick = function () {
-    var rgb = tinycolor(croquis.getToolColor()).toRgb();
+    var rgb = tinycolor(brush.getColor()).toRgb();
     croquis.fillLayer(tinycolor({r: rgb.r, g: rgb.g, b: rgb.b,
         a: croquis.getPaintingOpacity()}).toRgbString());
 }
