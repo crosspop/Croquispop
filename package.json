@@ -1,0 +1,15 @@
+{
+    "main": "croquispop.html",
+    "name": "Croquispop",
+    "window": {
+        "title": "Croquispop",
+        "toolbar": false,
+        "frame": true,
+        "width": 1024,
+        "height": 768,
+        "position": "mouse"
+    },
+    "webkit": {
+        "plugin": true
+    }
+}
