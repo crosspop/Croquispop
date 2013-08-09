@@ -1,14 +1,16 @@
 {
     "main": "croquispop.html",
     "name": "Croquispop",
+    "single-instance": false,
     "window": {
         "title": "Croquispop",
         "toolbar": false,
         "frame": true,
         "width": 1024,
         "height": 768,
-        "position": "mouse"
+        "position": "center"
     },
+    "nodejs": true,
     "webkit": {
         "plugin": true
     }
