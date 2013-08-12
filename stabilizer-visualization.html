@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Croquispop</title>
+    <link rel="stylesheet" type="text/css" href="./croquispop.css">
+    <link rel="stylesheet" type="text/css"
+          href="http://fonts.googleapis.com/earlyaccess/nanumgothic.css">
+  </head>
+  <body>
+    <div id="pendulums">
+    </div>
+    <span>Stabilizer</span>
+    <span>Level: </span>
+    <input id="level-slider" type="range" min="1" max="50">
+    <br>
+    <span>Weight: </span>
+    <input id="weight-slider" type="range" min="0" max="100">
+    <br>
+    <script src="./croquis.js/croquis.js"></script>
+    <script>
+    // <![CDATA[
+    var stabilizer;
+    var level;
+    var weight;
+    var upCalled;
+    //pendulums
+    var pendulums = document.getElementById('pendulums');
+    var pendulumList = [];
+    function createPendulum(size, color) {
+      size = (size == null) ? 20 : size;
+      color = (color == null) ? '#f00' : color;
+      var halfSize = size * 0.5;
+      var pendulum = document.createElement('div');
+      pendulum.style.setProperty('position', 'absolute');
+      pendulum.style.setProperty('background-color', color);
+      pendulum.style.setProperty('pointer-events', 'none');
+      pendulum.style.setProperty('font-size', '0');
+      pendulum.update = function (x, y, pressure) {
+        x += window.pageXOffset;
+        y += window.pageYOffset;
+        pendulum.style.setProperty('width', (pressure * size) + 'px');
+        pendulum.style.setProperty('height', (pressure * size) + 'px');
+        pendulum.style.setProperty('border-radius',
+                                   (pressure * halfSize) + 'px');
+        pendulum.style.setProperty('left', (x - halfSize * pressure) + 'px');
+        pendulum.style.setProperty('top', (y - halfSize * pressure) + 'px');
+      };
+      pendulum.update(0, 0, 0);
+      return pendulum;
+    }
+    //level slider
+    var levelSlider = document.getElementById('level-slider');
+    levelSlider.value = 10;
+    levelSlider.onchange = function () {
+      level = levelSlider.value;
+    };
+    levelSlider.onchange();
+    //weight slider
+    var weightSlider = document.getElementById('weight-slider');
+    weightSlider.value = 50;
+    weightSlider.onchange = function () {
+      weight = weightSlider.value * 0.01;
+    };
+    weightSlider.onchange();
+    function down(x, y, pressure) {
+      upCalled = false;
+    }
+    function move(x, y, pressure) {
+      if (!upCalled) {
+        var table = stabilizer.getParamTable();
+        for (var i = 0; i < table.length; ++i) {
+          var param = table[i];
+          pendulumList[i].update(table[i].x, table[i].y, table[i].pressure);
+        }
+      }
+    }
+    function up(x, y, pressure) {
+      pendulums.innerHTML = '';
+      pendulumList = [];
+    }
+    function onMouseMove(e) {
+      var x = e.clientX;
+      var y = e.clientY;
+      var pressure = Croquis.Tablet.pressure();
+      stabilizer.move(x, y, pressure);
+    }
+    function onMouseUp(e) {
+      upCalled = true;
+      stabilizer.up(up);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+    document.addEventListener('mousedown', function (e) {
+      var x = e.clientX;
+      var y = e.clientY;
+      var pressure = Croquis.Tablet.pressure();
+      stabilizer = new Croquis.Stabilizer(down, move, level,
+                                          weight, x, y, pressure);
+      pendulumList = [];
+      var table = stabilizer.getParamTable();
+      for (var i = 0; i < table.length; ++i) {
+        var pendulum = createPendulum();
+        pendulumList.push(pendulum);
+        pendulums.appendChild(pendulum);
+      }
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+    // ]]>
+    </script>
+  </body>
+</html>
