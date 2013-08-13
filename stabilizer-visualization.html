@@ -87,8 +87,11 @@
       stabilizer.move(x, y, pressure);
     }
     function onMouseUp(e) {
+      var x = e.clientX;
+      var y = e.clientY;
+      var pressure = Croquis.Tablet.pressure();
       upCalled = true;
-      stabilizer.up(up);
+      stabilizer.up(x, y, pressure);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     }
@@ -96,7 +99,7 @@
       var x = e.clientX;
       var y = e.clientY;
       var pressure = Croquis.Tablet.pressure();
-      stabilizer = new Croquis.Stabilizer(down, move, level,
+      stabilizer = new Croquis.Stabilizer(down, move, up, level,
                                           weight, x, y, pressure);
       pendulumList = [];
       var table = stabilizer.getParamTable();
