@@ -76,18 +76,28 @@ function brushImageMouseDown(e) {
     updatePointer();
 }
 
+// explorer version
+var IEVersion;
+(function () {
+    var ua = navigator.userAgent.toLowerCase();
+    IEVersion = (ua.indexOf('msie') == -1) ?
+                Infinity : parseInt(ua.split('msie')[1]);
+})();
+
 //brush pointer
 var brushPointerContainer = document.createElement('div');
 brushPointerContainer.className = 'brush-pointer';
 
-croquisDOMElement.addEventListener('mouseover', function () {
-    croquisDOMElement.addEventListener('mousemove', croquisMouseMove);
-    document.body.appendChild(brushPointerContainer);
-});
-croquisDOMElement.addEventListener('mouseout', function () {
-    croquisDOMElement.removeEventListener('mousemove', croquisMouseMove);
-    brushPointerContainer.remove();
-});
+if (IEVersion > 10) {
+    croquisDOMElement.addEventListener('mouseover', function () {
+        croquisDOMElement.addEventListener('mousemove', croquisMouseMove);
+        document.body.appendChild(brushPointerContainer);
+    });
+    croquisDOMElement.addEventListener('mouseout', function () {
+        croquisDOMElement.removeEventListener('mousemove', croquisMouseMove);
+        brushPointerContainer.parentElement.removeChild(brushPointerContainer);
+    });
+}
 
 function croquisMouseMove(e) {
     var x = e.clientX + window.pageXOffset;
@@ -99,8 +109,7 @@ function croquisMouseMove(e) {
 function updatePointer() {
     var image = currentBrush;
     var threshold;
-    if (currentBrush == circleBrush)
-    {
+    if (currentBrush == circleBrush) {
         image = null;
         threshold = 0xff;
     }
