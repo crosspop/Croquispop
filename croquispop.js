@@ -131,8 +131,12 @@ updatePointer();
 var colorPickerHueSlider =
     document.getElementById('color-picker-hue-slider');
 var colorPickerSb = document.getElementById('color-picker-sb');
-var colorPickerSaturate = document.getElementById('color-picker-saturate');
-var colorPickerThumb = document.getElementById('color-picker-thumb');
+var colorPickerHSBRect = new HSBRect(150, 150);
+colorPickerHSBRect.DOMElement.id = 'color-picker-hsbrect';
+colorPickerSb.appendChild(colorPickerHSBRect.DOMElement);
+var colorPickerThumb = document.createElement('div');
+colorPickerThumb.id = 'color-picker-thumb';
+colorPickerSb.appendChild(colorPickerThumb);
 colorPickerHueSlider.value = tinycolor(brush.getColor()).toHsv().h;
 
 function setColor() {
@@ -153,10 +157,7 @@ function setColor() {
 }
 
 colorPickerHueSlider.onchange = function () {
-    var hue = colorPickerHueSlider.value;
-    colorPickerSaturate.style.setProperty('background-image',
-        'linear-gradient(to right, hsla(' +
-        hue + ', 100%, 50%, 0), hsl(' + hue + ', 100%, 50%))');
+    colorPickerHSBRect.hue = colorPickerHueSlider.value;
     setColor();
 }
 
