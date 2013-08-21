@@ -16,12 +16,17 @@ body {
   cursor: crosshair;
 }
 
+.croquis-dirty-rect-display {
+  touch-action: none;
+}
+
 #right-side {
   display: inline-block;
   vertical-align: top;
 }
 
 #color-picker {
+  touch-action: none;
 }
 
 #color-picker:active {
@@ -105,10 +110,10 @@ body {
 
 span {
   font-size: 12pt;
-  font-family: 'Nanum Gothic';
+  font-family: 'Nanum Gothic', sans-serif;
 }
 
 .comment {
   font-size: 9pt;
-  font-family: 'Nanum Gothic';
+  font-family: 'Nanum Gothic', sans-serif;
 }
