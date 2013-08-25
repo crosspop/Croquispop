@@ -7,3 +7,6 @@
 [submodule "HSBRect"]
 	path = HSBRect
 	url = https://disjukr@github.com/disjukr/HSBRect.git
+[submodule "input-range-polyfill"]
+	path = input-range-polyfill
+	url = https://github.com/disjukr/input-range-polyfill.git
