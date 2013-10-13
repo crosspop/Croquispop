@@ -22,7 +22,7 @@ var canvasArea = document.getElementById('canvas-area');
 canvasArea.appendChild(croquisDOMElement);
 function canvasPointerDown(e) {
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
-    if (IEVersion > 10)
+    if (pointerEventsNone)
         canvasArea.style.setProperty('cursor', 'none');
     croquis.down(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
     document.addEventListener('pointermove', canvasPointerMove);
@@ -34,7 +34,7 @@ function canvasPointerMove(e) {
 }
 function canvasPointerUp(e) {
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
-    if (IEVersion > 10)
+    if (pointerEventsNone)
         canvasArea.style.setProperty('cursor', 'crosshair');
     croquis.up(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
     document.removeEventListener('pointermove', canvasPointerMove);
@@ -78,19 +78,14 @@ function brushImagePointerDown(e) {
     updatePointer();
 }
 
-// explorer version
-var IEVersion;
-(function () {
-    var ua = navigator.userAgent.toLowerCase();
-    IEVersion = (ua.indexOf('msie') == -1) ?
-                Infinity : parseInt(ua.split('msie')[1]);
-})();
+// checking pointer-events property support
+var pointerEventsNone = document.documentElement.style.pointerEvents !== undefined;
 
 //brush pointer
 var brushPointerContainer = document.createElement('div');
 brushPointerContainer.className = 'brush-pointer';
 
-if (IEVersion > 10) {
+if (pointerEventsNone) {
     croquisDOMElement.addEventListener('pointerover', function () {
         croquisDOMElement.addEventListener('pointermove', croquisPointerMove);
         document.body.appendChild(brushPointerContainer);
@@ -102,7 +97,7 @@ if (IEVersion > 10) {
 }
 
 function croquisPointerMove(e) {
-    if (IEVersion > 10) {
+    if (pointerEventsNone) {
         var x = e.clientX + window.pageXOffset;
         var y = e.clientY + window.pageYOffset;
         brushPointerContainer.style.setProperty('left', x + 'px');
@@ -111,7 +106,7 @@ function croquisPointerMove(e) {
 }
 
 function updatePointer() {
-    if (IEVersion > 10) {
+    if (pointerEventsNone) {
         var image = currentBrush;
         var threshold;
         if (currentBrush == circleBrush) {
