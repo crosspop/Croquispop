@@ -16,12 +16,17 @@ body {
   cursor: crosshair;
 }
 
+.croquis-dirty-rect-display {
+  touch-action: none;
+}
+
 #right-side {
   display: inline-block;
   vertical-align: top;
 }
 
 #color-picker {
+  touch-action: none;
 }
 
 #color-picker:active {
@@ -40,21 +45,8 @@ body {
   background-color: #fff;
 }
 
-#color-picker-saturate {
-  width: 150px;
-  height: 150px;
-  margin-top: -150px;
-  background-image: linear-gradient(to right, hsla(0, 100%, 50%, 0), red);
-}
-
-#color-picker-brightness {
-  width: 150px;
-  height: 150px;
-  margin-top: -150px;
-  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), black);
-}
-
 #color-picker-thumb {
+  position: relative;
   margin-top: -7.5px;
   margin-left: -7.5px;
   width: 11px;
@@ -105,10 +97,10 @@ body {
 
 span {
   font-size: 12pt;
-  font-family: 'Nanum Gothic';
+  font-family: 'Nanum Gothic', sans-serif;
 }
 
 .comment {
   font-size: 9pt;
-  font-family: 'Nanum Gothic';
+  font-family: 'Nanum Gothic', sans-serif;
 }

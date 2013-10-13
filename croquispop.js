@@ -20,29 +20,31 @@ croquis.setToolStabilizeWeight(0.5);
 var croquisDOMElement = croquis.getDOMElement();
 var canvasArea = document.getElementById('canvas-area');
 canvasArea.appendChild(croquisDOMElement);
-function canvasMouseDown(e) {
-    var mousePosition = getRelativePosition(e.clientX, e.clientY);
-    canvasArea.style.setProperty('cursor', 'none');
-    croquis.down(mousePosition.x, mousePosition.y);
-    document.addEventListener('mousemove', canvasMouseMove);
-    document.addEventListener('mouseup', canvasMouseUp);
+function canvasPointerDown(e) {
+    var pointerPosition = getRelativePosition(e.clientX, e.clientY);
+    if (IEVersion > 10)
+        canvasArea.style.setProperty('cursor', 'none');
+    croquis.down(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    document.addEventListener('pointermove', canvasPointerMove);
+    document.addEventListener('pointerup', canvasPointerUp);
 }
-function canvasMouseMove(e) {
-    var mousePosition = getRelativePosition(e.clientX, e.clientY);
-    croquis.move(mousePosition.x, mousePosition.y);
+function canvasPointerMove(e) {
+    var pointerPosition = getRelativePosition(e.clientX, e.clientY);
+    croquis.move(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
 }
-function canvasMouseUp(e) {
-    var mousePosition = getRelativePosition(e.clientX, e.clientY);
-    canvasArea.style.setProperty('cursor', 'crosshair');
-    croquis.up(mousePosition.x, mousePosition.y);
-    document.removeEventListener('mousemove', canvasMouseMove);
-    document.removeEventListener('mouseup', canvasMouseUp);
+function canvasPointerUp(e) {
+    var pointerPosition = getRelativePosition(e.clientX, e.clientY);
+    if (IEVersion > 10)
+        canvasArea.style.setProperty('cursor', 'crosshair');
+    croquis.up(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    document.removeEventListener('pointermove', canvasPointerMove);
+    document.removeEventListener('pointerup', canvasPointerUp);
 }
 function getRelativePosition(absoluteX, absoluteY) {
     var rect = croquisDOMElement.getBoundingClientRect();
     return {x: absoluteX - rect.left, y: absoluteY - rect.top};
 }
-croquisDOMElement.addEventListener('mousedown', canvasMouseDown);
+croquisDOMElement.addEventListener('pointerdown', canvasPointerDown);
 
 //clear & fill button ui
 var clearButton = document.getElementById('clear-button');
@@ -62,10 +64,10 @@ var brushImages = document.getElementsByClassName('brush-image');
 var currentBrush = circleBrush;
 
 Array.prototype.map.call(brushImages, function (brush) {
-    brush.addEventListener('mousedown', brushImageMouseDown);
+    brush.addEventListener('pointerdown', brushImagePointerDown);
 });
 
-function brushImageMouseDown(e) {
+function brushImagePointerDown(e) {
     var image = e.currentTarget;
     currentBrush.className = 'brush-image';
     image.className = 'brush-image on';
@@ -89,41 +91,45 @@ var brushPointerContainer = document.createElement('div');
 brushPointerContainer.className = 'brush-pointer';
 
 if (IEVersion > 10) {
-    croquisDOMElement.addEventListener('mouseover', function () {
-        croquisDOMElement.addEventListener('mousemove', croquisMouseMove);
+    croquisDOMElement.addEventListener('pointerover', function () {
+        croquisDOMElement.addEventListener('pointermove', croquisPointerMove);
         document.body.appendChild(brushPointerContainer);
     });
-    croquisDOMElement.addEventListener('mouseout', function () {
-        croquisDOMElement.removeEventListener('mousemove', croquisMouseMove);
+    croquisDOMElement.addEventListener('pointerout', function () {
+        croquisDOMElement.removeEventListener('pointermove', croquisPointerMove);
         brushPointerContainer.parentElement.removeChild(brushPointerContainer);
     });
 }
 
-function croquisMouseMove(e) {
-    var x = e.clientX + window.pageXOffset;
-    var y = e.clientY + window.pageYOffset;
-    brushPointerContainer.style.setProperty('left', x + 'px');
-    brushPointerContainer.style.setProperty('top', y + 'px');
+function croquisPointerMove(e) {
+    if (IEVersion > 10) {
+        var x = e.clientX + window.pageXOffset;
+        var y = e.clientY + window.pageYOffset;
+        brushPointerContainer.style.setProperty('left', x + 'px');
+        brushPointerContainer.style.setProperty('top', y + 'px');
+    }
 }
 
 function updatePointer() {
-    var image = currentBrush;
-    var threshold;
-    if (currentBrush == circleBrush) {
-        image = null;
-        threshold = 0xff;
+    if (IEVersion > 10) {
+        var image = currentBrush;
+        var threshold;
+        if (currentBrush == circleBrush) {
+            image = null;
+            threshold = 0xff;
+        }
+        else {
+            threshold = 0x30;
+        }
+        var brushPointer = Croquis.createBrushPointer(
+            image, brush.getSize(), threshold, true);
+        brushPointer.style.setProperty('margin-left',
+            '-' + (brushPointer.width * 0.5) + 'px');
+        brushPointer.style.setProperty('margin-top',
+            '-' + (brushPointer.height * 0.5) + 'px');
+        brushPointerContainer.innerHTML = '';
+        brushPointerContainer.appendChild(brushPointer);
     }
-    else {
-        threshold = 0x30;
-    }
-    var brushPointer = Croquis.createBrushPointer(
-        image, brush.getSize(), threshold, true);
-    brushPointer.style.setProperty('margin-left',
-        '-' + (brushPointer.width * 0.5) + 'px');
-    brushPointer.style.setProperty('margin-top',
-        '-' + (brushPointer.height * 0.5) + 'px');
-    brushPointerContainer.innerHTML = '';
-    brushPointerContainer.appendChild(brushPointer);
 }
 updatePointer();
 
@@ -131,8 +137,12 @@ updatePointer();
 var colorPickerHueSlider =
     document.getElementById('color-picker-hue-slider');
 var colorPickerSb = document.getElementById('color-picker-sb');
-var colorPickerSaturate = document.getElementById('color-picker-saturate');
-var colorPickerThumb = document.getElementById('color-picker-thumb');
+var colorPickerHSBRect = new HSBRect(150, 150);
+colorPickerHSBRect.DOMElement.id = 'color-picker-hsbrect';
+colorPickerSb.appendChild(colorPickerHSBRect.DOMElement);
+var colorPickerThumb = document.createElement('div');
+colorPickerThumb.id = 'color-picker-thumb';
+colorPickerSb.appendChild(colorPickerThumb);
 colorPickerHueSlider.value = tinycolor(brush.getColor()).toHsv().h;
 
 function setColor() {
@@ -153,21 +163,18 @@ function setColor() {
 }
 
 colorPickerHueSlider.onchange = function () {
-    var hue = colorPickerHueSlider.value;
-    colorPickerSaturate.style.setProperty('background-image',
-        'linear-gradient(to right, hsla(' +
-        hue + ', 100%, 50%, 0), hsl(' + hue + ', 100%, 50%))');
+    colorPickerHSBRect.hue = colorPickerHueSlider.value;
     setColor();
 }
 
-function colorPickerMouseDown(e) {
-    document.addEventListener('mousemove', colorPickerMouseMove);
-    colorPickerMouseMove(e);
+function colorPickerPointerDown(e) {
+    document.addEventListener('pointermove', colorPickerPointerMove);
+    colorPickerPointerMove(e);
 }
-function colorPickerMouseUp(e) {
-    document.removeEventListener('mousemove', colorPickerMouseMove);
+function colorPickerPointerUp(e) {
+    document.removeEventListener('pointermove', colorPickerPointerMove);
 }
-function colorPickerMouseMove(e) {
+function colorPickerPointerMove(e) {
     var boundRect = colorPickerSb.getBoundingClientRect();
     var x = (e.clientX - boundRect.left);
     var y = (e.clientY - boundRect.top);
@@ -187,8 +194,8 @@ function pickColor(x, y) {
         (y < sbSize * 0.5)? '#000' : '#fff');
     setColor();
 }
-colorPickerSb.addEventListener('mousedown', colorPickerMouseDown);
-document.addEventListener('mouseup', colorPickerMouseUp);
+colorPickerSb.addEventListener('pointerdown', colorPickerPointerDown);
+document.addEventListener('pointerup', colorPickerPointerUp);
 
 var backgroundCheckerImage;
 (function () {

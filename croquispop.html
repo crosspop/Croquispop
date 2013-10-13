@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="UTF-8">
     <title>Croquispop</title>
     <link rel="stylesheet" type="text/css" href="./croquispop.css">
+    <!--[if lt IE 11]>
+    <link rel="stylesheet" type="text/css"
+          href="./input-range-polyfill/input-range-polyfill.css">
+    <![endif]-->
     <link rel="stylesheet" type="text/css"
           href="http://fonts.googleapis.com/earlyaccess/nanumgothic.css">
+	<script src="./hand.minified-1.1.1.js"></script>
   </head>
-  <body>
+  <body unselectable="on">
     <object id="tablet-api" type="application/x-wacomtabletplugin"></object>
     <div id="tool-shelf">
       <span>Stabilizer level: </span>
@@ -32,10 +37,6 @@
     <div id="right-side">
       <div id="color-picker">
         <div id="color-picker-sb">
-          <div id="color-picker-white"></div>
-          <div id="color-picker-saturate"></div>
-          <div id="color-picker-brightness"></div>
-          <div id="color-picker-thumb"></div>
         </div>
         <span>hue: </span>
         <input id="color-picker-hue-slider" type="range" min="0" max="360">
@@ -70,8 +71,28 @@
     <p class="comment">If pressure is not applied, try installing the
       <a href="http://www.wacom.com/support/drivers" target="_blank">
         recent version of the graphics tablet driver.</a></p>
+    <!--[if lt IE 11]>
+    <script src="./input-range-polyfill/input-range-polyfill.js"></script>
+    <![endif]-->
     <script src="./TinyColor/tinycolor.js"></script>
+    <script src="./HSBRect/HSBRect.js"></script>
     <script src="./croquis.js/croquis.js"></script>
     <script src="./croquispop.js"></script>
+    <!--[if lt IE 10]>
+    <script>
+      // code from: http://stackoverflow.com/a/4448965/1711246
+      function makeUnselectable(node) {
+        if (node.nodeType == 1) {
+          node.setAttribute('unselectable', 'on');
+        }
+        var child = node.firstChild;
+        while (child) {
+          makeUnselectable(child);
+          child = child.nextSibling;
+        }
+      }
+      makeUnselectable(document.body);
+    </script>
+    <![endif]-->
   </body>
 </html>
