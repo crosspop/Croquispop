@@ -289,7 +289,7 @@ function documentKeyDown(e) {
 function emulatePointerEvent(e) {
     e.pointerType = Croquis.Tablet.pointerType;
     e.pressure = Croquis.Tablet.pressure;
-    if (Croquis.Tablet.isEraser) {
+    if (e.pointerType === "pen" && Croquis.Tablet.isEraser) {
         e.button = 5;
         e.buttons = 32;
     }
