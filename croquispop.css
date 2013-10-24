@@ -16,7 +16,7 @@ body {
   cursor: crosshair;
 }
 
-canvas {
+.croquis-dirty-rect-display {
   touch-action: none;
 }
 
@@ -33,6 +33,8 @@ canvas {
   width: 150px;
   height: 150px;
   overflow: hidden;
+  touch-action: none;
+  position: relative;
 }
 
 #color-picker-white {
