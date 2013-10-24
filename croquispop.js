@@ -21,22 +21,32 @@ var croquisDOMElement = croquis.getDOMElement();
 var canvasArea = document.getElementById('canvas-area');
 canvasArea.appendChild(croquisDOMElement);
 function canvasPointerDown(e) {
+    if (!navigator.pointerEnabled)//check Pointer Events support
+        e = emulatePointerEvent(e);
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
     if (pointerEventsNone)
         canvasArea.style.setProperty('cursor', 'none');
-    croquis.down(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    if (e.pointerType === "pen" && e.button == 5)
+        croquis.setPaintingKnockout(true);
+    croquis.down(pointerPosition.x, pointerPosition.y, e.pressure);
     document.addEventListener('pointermove', canvasPointerMove);
     document.addEventListener('pointerup', canvasPointerUp);
 }
 function canvasPointerMove(e) {
+    if (!navigator.pointerEnabled)//check Pointer Events support
+        e = emulatePointerEvent(e);
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
-    croquis.move(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    croquis.move(pointerPosition.x, pointerPosition.y, e.pressure);
 }
 function canvasPointerUp(e) {
+    if (!navigator.pointerEnabled)//check Pointer Events support
+        e = emulatePointerEvent(e);
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
     if (pointerEventsNone)
         canvasArea.style.setProperty('cursor', 'crosshair');
-    croquis.up(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    croquis.up(pointerPosition.x, pointerPosition.y, e.pressure);
+    if (e.pointerType === "pen" && e.button == 5)
+        setTimeout(function() {croquis.setPaintingKnockout(selectEraserCheckbox.checked)}, 30);//timeout should be longer than 20 (knockoutTickInterval in Croquis)
     document.removeEventListener('pointermove', canvasPointerMove);
     document.removeEventListener('pointerup', canvasPointerUp);
 }
@@ -274,4 +284,14 @@ function documentKeyDown(e) {
             break;
         }
     }
+}
+
+function emulatePointerEvent(e) {
+    e.pointerType = Croquis.Tablet.pointerType;
+    e.pressure = Croquis.Tablet.pressure;
+    if (Croquis.Tablet.isEraser) {
+        e.button = 5;
+        e.buttons = 32;
+    }
+    return e;
 }
