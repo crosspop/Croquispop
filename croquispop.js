@@ -284,7 +284,7 @@ function documentKeyDown(e) {
 }
 
 function setPointerEvent(e) {
-    if (e.pointerType !== "pen" && Croquis.Tablet.pen && Croquis.Tablet.pen().pointerType) {//it says it's not a pen but it might be a wacom pen
+    if (e.pointerType !== "pen" && Croquis.Tablet.pen() && Croquis.Tablet.pen().pointerType) {//it says it's not a pen but it might be a wacom pen
         e.pointerType = "pen";
         e.pressure = Croquis.Tablet.pressure();
         if (Croquis.Tablet.isEraser) {
