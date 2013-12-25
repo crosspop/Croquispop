@@ -289,8 +289,8 @@ function setPointerEvent(e) {
         e.pressure = Croquis.Tablet.pressure();
         if (Croquis.Tablet.isEraser()) {
             Object.defineProperties(e, {
-                "button": { value: 5, writable: true },
-                "buttons": { value: 32, writable: true }
+                "button": { value: 5 },
+                "buttons": { value: 32 }
             });
         }
     }
