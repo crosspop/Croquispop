@@ -287,9 +287,11 @@ function setPointerEvent(e) {
     if (e.pointerType !== "pen" && Croquis.Tablet.pen() && Croquis.Tablet.pen().pointerType) {//it says it's not a pen but it might be a wacom pen
         e.pointerType = "pen";
         e.pressure = Croquis.Tablet.pressure();
-        if (Croquis.Tablet.isEraser) {
-            e.button = 5;
-            e.buttons = 32;
+        if (Croquis.Tablet.isEraser()) {
+            Object.defineProperties(e, {
+                "button": { value: 5, writable: true },
+                "buttons": { value: 32, writable: true }
+            });
         }
     }
 }
