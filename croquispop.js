@@ -21,22 +21,29 @@ var croquisDOMElement = croquis.getDOMElement();
 var canvasArea = document.getElementById('canvas-area');
 canvasArea.appendChild(croquisDOMElement);
 function canvasPointerDown(e) {
+    setPointerEvent(e);
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
     if (pointerEventsNone)
         canvasArea.style.setProperty('cursor', 'none');
-    croquis.down(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    if (e.pointerType === "pen" && e.button == 5)
+        croquis.setPaintingKnockout(true);
+    croquis.down(pointerPosition.x, pointerPosition.y, e.pointerType === "pen" ? e.pressure : 1);
     document.addEventListener('pointermove', canvasPointerMove);
     document.addEventListener('pointerup', canvasPointerUp);
 }
 function canvasPointerMove(e) {
+    setPointerEvent(e);
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
-    croquis.move(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    croquis.move(pointerPosition.x, pointerPosition.y, e.pointerType === "pen" ? e.pressure : 1);
 }
 function canvasPointerUp(e) {
+    setPointerEvent(e);
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
     if (pointerEventsNone)
         canvasArea.style.setProperty('cursor', 'crosshair');
-    croquis.up(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    croquis.up(pointerPosition.x, pointerPosition.y, e.pointerType === "pen" ? e.pressure : 1);
+    if (e.pointerType === "pen" && e.button == 5)
+        setTimeout(function() {croquis.setPaintingKnockout(selectEraserCheckbox.checked)}, 30);//timeout should be longer than 20 (knockoutTickInterval in Croquis)
     document.removeEventListener('pointermove', canvasPointerMove);
     document.removeEventListener('pointerup', canvasPointerUp);
 }
@@ -272,6 +279,19 @@ function documentKeyDown(e) {
         case 90: //ctrl + z
             croquis[e.shiftKey ? 'redo' : 'undo']();
             break;
+        }
+    }
+}
+
+function setPointerEvent(e) {
+    if (e.pointerType !== "pen" && Croquis.Tablet.pen() && Croquis.Tablet.pen().pointerType) {//it says it's not a pen but it might be a wacom pen
+        e.pointerType = "pen";
+        e.pressure = Croquis.Tablet.pressure();
+        if (Croquis.Tablet.isEraser()) {
+            Object.defineProperties(e, {
+                "button": { value: 5 },
+                "buttons": { value: 32 }
+            });
         }
     }
 }
