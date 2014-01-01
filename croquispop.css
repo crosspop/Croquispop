@@ -25,10 +25,6 @@ body {
   vertical-align: top;
 }
 
-#color-picker {
-  touch-action: none;
-}
-
 #color-picker:active {
   cursor: default;
 }
@@ -37,6 +33,8 @@ body {
   width: 150px;
   height: 150px;
   overflow: hidden;
+  touch-action: none;
+  position: relative;
 }
 
 #color-picker-white {

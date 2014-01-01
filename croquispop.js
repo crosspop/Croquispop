@@ -21,22 +21,29 @@ var croquisDOMElement = croquis.getDOMElement();
 var canvasArea = document.getElementById('canvas-area');
 canvasArea.appendChild(croquisDOMElement);
 function canvasPointerDown(e) {
+    setPointerEvent(e);
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
-    if (IEVersion > 10)
+    if (pointerEventsNone)
         canvasArea.style.setProperty('cursor', 'none');
-    croquis.down(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    if (e.pointerType === "pen" && e.button == 5)
+        croquis.setPaintingKnockout(true);
+    croquis.down(pointerPosition.x, pointerPosition.y, e.pointerType === "pen" ? e.pressure : 1);
     document.addEventListener('pointermove', canvasPointerMove);
     document.addEventListener('pointerup', canvasPointerUp);
 }
 function canvasPointerMove(e) {
+    setPointerEvent(e);
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
-    croquis.move(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    croquis.move(pointerPosition.x, pointerPosition.y, e.pointerType === "pen" ? e.pressure : 1);
 }
 function canvasPointerUp(e) {
+    setPointerEvent(e);
     var pointerPosition = getRelativePosition(e.clientX, e.clientY);
-    if (IEVersion > 10)
+    if (pointerEventsNone)
         canvasArea.style.setProperty('cursor', 'crosshair');
-    croquis.up(pointerPosition.x, pointerPosition.y, e.pointerType == "pen" ? e.pressure : null);
+    croquis.up(pointerPosition.x, pointerPosition.y, e.pointerType === "pen" ? e.pressure : 1);
+    if (e.pointerType === "pen" && e.button == 5)
+        setTimeout(function() {croquis.setPaintingKnockout(selectEraserCheckbox.checked)}, 30);//timeout should be longer than 20 (knockoutTickInterval in Croquis)
     document.removeEventListener('pointermove', canvasPointerMove);
     document.removeEventListener('pointerup', canvasPointerUp);
 }
@@ -78,19 +85,14 @@ function brushImagePointerDown(e) {
     updatePointer();
 }
 
-// explorer version
-var IEVersion;
-(function () {
-    var ua = navigator.userAgent.toLowerCase();
-    IEVersion = (ua.indexOf('msie') == -1) ?
-                Infinity : parseInt(ua.split('msie')[1]);
-})();
+// checking pointer-events property support
+var pointerEventsNone = document.documentElement.style.pointerEvents !== undefined;
 
 //brush pointer
 var brushPointerContainer = document.createElement('div');
 brushPointerContainer.className = 'brush-pointer';
 
-if (IEVersion > 10) {
+if (pointerEventsNone) {
     croquisDOMElement.addEventListener('pointerover', function () {
         croquisDOMElement.addEventListener('pointermove', croquisPointerMove);
         document.body.appendChild(brushPointerContainer);
@@ -102,7 +104,7 @@ if (IEVersion > 10) {
 }
 
 function croquisPointerMove(e) {
-    if (IEVersion > 10) {
+    if (pointerEventsNone) {
         var x = e.clientX + window.pageXOffset;
         var y = e.clientY + window.pageYOffset;
         brushPointerContainer.style.setProperty('left', x + 'px');
@@ -111,7 +113,7 @@ function croquisPointerMove(e) {
 }
 
 function updatePointer() {
-    if (IEVersion > 10) {
+    if (pointerEventsNone) {
         var image = currentBrush;
         var threshold;
         if (currentBrush == circleBrush) {
@@ -277,6 +279,19 @@ function documentKeyDown(e) {
         case 90: //ctrl + z
             croquis[e.shiftKey ? 'redo' : 'undo']();
             break;
+        }
+    }
+}
+
+function setPointerEvent(e) {
+    if (e.pointerType !== "pen" && Croquis.Tablet.pen() && Croquis.Tablet.pen().pointerType) {//it says it's not a pen but it might be a wacom pen
+        e.pointerType = "pen";
+        e.pressure = Croquis.Tablet.pressure();
+        if (Croquis.Tablet.isEraser()) {
+            Object.defineProperties(e, {
+                "button": { value: 5 },
+                "buttons": { value: 32 }
+            });
         }
     }
 }
