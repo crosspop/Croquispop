@@ -234,11 +234,13 @@ var brushOpacitySlider = document.getElementById('brush-opacity-slider');
 var brushFlowSlider = document.getElementById('brush-flow-slider');
 var brushSpacingSlider = document.getElementById('brush-spacing-slider');
 var brushAngleSlider = document.getElementById('brush-angle-slider');
+var brushRotateToDirectionCheckbox = document.getElementById('brush-rotate-to-direction-checkbox');
 brushSizeSlider.value = brush.getSize();
 brushOpacitySlider.value = croquis.getPaintingOpacity() * 100;
 brushFlowSlider.value = brush.getFlow() * 100;
 brushSpacingSlider.value = brush.getSpacing() * 100;
 brushAngleSlider.value = brush.getAngle();
+brushRotateToDirectionCheckbox.checked = brush.getRotateToDirection();
 
 toolStabilizeLevelSlider.onchange = function () {
     croquis.setToolStabilizeLevel(toolStabilizeLevelSlider.value);
@@ -269,6 +271,9 @@ brushSpacingSlider.onchange = function () {
 brushAngleSlider.onchange = function () {
     brush.setAngle(brushAngleSlider.value);
     updatePointer();
+}
+brushRotateToDirectionCheckbox.onchange = function () {
+    brush.setRotateToDirection(brushRotateToDirectionCheckbox.checked);
 }
 
 // Platform variables

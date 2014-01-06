@@ -35,6 +35,9 @@
     <span>Angle: </span>
     <input id="angle-slider" type="range" min="0" max="360">
     <br>
+    <span>Rotate to direction: </span>
+    <input id="rotate-to-direction-checkbox" type="checkbox">
+    <br>
     <span>Alpha threshold: </span>
     <input id="alpha-threshold-slider" type="range" min="1" max="255">
     <br>
@@ -69,6 +72,7 @@
     var flowSlider = document.getElementById('flow-slider');
     var spacingSlider = document.getElementById('spacing-slider');
     var angleSlider = document.getElementById('angle-slider');
+    var rotateToDirectionCheckbox = document.getElementById('rotate-to-direction-checkbox');
     var alphaThresholdSlider = document.getElementById('alpha-threshold-slider');
     var simulatePressureCheckbox = document.getElementById('simulate-pressure-checkbox');
 
@@ -95,6 +99,10 @@
     angleSlider.onchange = function () {
       brush.setAngle(angleSlider.value);
       updatePointer();
+      updatePreview();
+    };
+    rotateToDirectionCheckbox.onchange = function () {
+      brush.setRotateToDirection(rotateToDirectionCheckbox.checked);
       updatePreview();
     };
     alphaThresholdSlider.onchange = function () {
