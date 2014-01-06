@@ -20,6 +20,9 @@
     <span>Preview: </span>
     <div id="canvas-area"></div>
     <br>
+    <span>Simulate pressure: </span>
+    <input id="simulate-pressure-checkbox" type="checkbox">
+    <br>
     <span>Size: </span>
     <input id="size-slider" type="range" min="0" max="100">
     <br>
@@ -67,12 +70,14 @@
     var spacingSlider = document.getElementById('spacing-slider');
     var angleSlider = document.getElementById('angle-slider');
     var alphaThresholdSlider = document.getElementById('alpha-threshold-slider');
+    var simulatePressureCheckbox = document.getElementById('simulate-pressure-checkbox');
 
     sizeSlider.value = brush.getSize();
     flowSlider.value = brush.getFlow() * 100;
     spacingSlider.value = brush.getSpacing() * 100;
     angleSlider.value = brush.getAngle();
     alphaThresholdSlider.value = 0x20;
+    simulatePressureCheckbox.checked = true;
     
     sizeSlider.onchange = function () {
       brush.setSize(sizeSlider.value);
@@ -94,6 +99,9 @@
     };
     alphaThresholdSlider.onchange = function () {
       updatePointer();
+      updatePreview();
+    };
+    simulatePressureCheckbox.onchange = function () {
       updatePreview();
     };
 
@@ -136,7 +144,8 @@
       for (var t = 0; t < 1; t += 0.01) {
         var horizontalPos = t * paddedWidth + padding;
         var verticalPos = Math.sin(deg360 * t) * amplitude + halfH;
-        var pressure = Math.sin(deg180 * t);
+        var pressure = simulatePressureCheckbox.checked ?
+                        Math.sin(deg180 * t) : 1;
         croquis.move(horizontalPos, verticalPos, pressure);
       }
       croquis.up(w - padding, halfH, 0);
