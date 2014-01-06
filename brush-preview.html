@@ -139,16 +139,17 @@
       var padding = 50;
       var paddedWidth = w - padding * 2;
       var amplitude = halfH - padding;
+      var pressure = simulatePressureCheckbox.checked ? 0 : 1;
       croquis.clearLayer();
-      croquis.down(padding, halfH, 0);
+      croquis.down(padding, halfH, pressure);
       for (var t = 0; t < 1; t += 0.01) {
         var horizontalPos = t * paddedWidth + padding;
         var verticalPos = Math.sin(deg360 * t) * amplitude + halfH;
-        var pressure = simulatePressureCheckbox.checked ?
+        pressure = simulatePressureCheckbox.checked ?
                         Math.sin(deg180 * t) : 1;
         croquis.move(horizontalPos, verticalPos, pressure);
       }
-      croquis.up(w - padding, halfH, 0);
+      croquis.up(w - padding, halfH, pressure);
     }
 
     updatePointer();
