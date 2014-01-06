@@ -29,6 +29,9 @@
     <span>Spacing: </span>
     <input id="spacing-slider" type="range" min="0" max="500">
     <br>
+    <span>Angle: </span>
+    <input id="angle-slider" type="range" min="0" max="360">
+    <br>
     <span>Alpha threshold: </span>
     <input id="alpha-threshold-slider" type="range" min="1" max="255">
     <br>
@@ -62,11 +65,13 @@
     var sizeSlider = document.getElementById('size-slider');
     var flowSlider = document.getElementById('flow-slider');
     var spacingSlider = document.getElementById('spacing-slider');
+    var angleSlider = document.getElementById('angle-slider');
     var alphaThresholdSlider = document.getElementById('alpha-threshold-slider');
 
     sizeSlider.value = brush.getSize();
     flowSlider.value = brush.getFlow() * 100;
     spacingSlider.value = brush.getSpacing() * 100;
+    angleSlider.value = brush.getAngle();
     alphaThresholdSlider.value = 0x20;
     
     sizeSlider.onchange = function () {
@@ -80,6 +85,11 @@
     };
     spacingSlider.onchange = function () {
       brush.setSpacing(spacingSlider.value * 0.01);
+      updatePreview();
+    };
+    angleSlider.onchange = function () {
+      brush.setAngle(angleSlider.value);
+      updatePointer();
       updatePreview();
     };
     alphaThresholdSlider.onchange = function () {
@@ -105,9 +115,11 @@
 
     function updatePointer() {
       var size = sizeSlider.value;
+      var angle = angleSlider.value;
       var alphaThreshold = alphaThresholdSlider.value;
       var pointerImage = Croquis.createBrushPointer(
-        brush.getImage(), size, alphaThreshold, true);
+        brush.getImage(), size, angle, alphaThreshold, true);
+      pointerImage.style.cssText = 'border: solid 1px';
       pointerContainer.innerHTML = '';
       pointerContainer.appendChild(pointerImage);
     }

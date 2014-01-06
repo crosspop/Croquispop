@@ -124,7 +124,7 @@ function updatePointer() {
             threshold = 0x30;
         }
         var brushPointer = Croquis.createBrushPointer(
-            image, brush.getSize(), threshold, true);
+            image, brush.getSize(), brush.getAngle(), threshold, true);
         brushPointer.style.setProperty('margin-left',
             '-' + (brushPointer.width * 0.5) + 'px');
         brushPointer.style.setProperty('margin-top',
@@ -233,10 +233,12 @@ var brushSizeSlider = document.getElementById('brush-size-slider');
 var brushOpacitySlider = document.getElementById('brush-opacity-slider');
 var brushFlowSlider = document.getElementById('brush-flow-slider');
 var brushSpacingSlider = document.getElementById('brush-spacing-slider');
+var brushAngleSlider = document.getElementById('brush-angle-slider');
 brushSizeSlider.value = brush.getSize();
 brushOpacitySlider.value = croquis.getPaintingOpacity() * 100;
 brushFlowSlider.value = brush.getFlow() * 100;
 brushSpacingSlider.value = brush.getSpacing() * 100;
+brushAngleSlider.value = brush.getAngle();
 
 toolStabilizeLevelSlider.onchange = function () {
     croquis.setToolStabilizeLevel(toolStabilizeLevelSlider.value);
@@ -263,6 +265,10 @@ brushFlowSlider.onchange = function () {
 }
 brushSpacingSlider.onchange = function () {
     brush.setSpacing(brushSpacingSlider.value * 0.01);
+}
+brushAngleSlider.onchange = function () {
+    brush.setAngle(brushAngleSlider.value);
+    updatePointer();
 }
 
 // Platform variables
