@@ -25,7 +25,7 @@
     <input id="simulate-pressure-checkbox" type="checkbox">
     <br>
     <span>Size: </span>
-    <input id="size-slider" type="range" min="0" max="100">
+    <input id="size-slider" type="range" min="0" max="50">
     <br>
     <span>Flow: </span>
     <input id="flow-slider" type="range" min="0" max="100">
@@ -39,6 +39,12 @@
     <span>Rotate to direction: </span>
     <input id="rotate-to-direction-checkbox" type="checkbox">
     <br>
+    <span>Normal spread: </span>
+    <input id="normal-spread-slider" type="range" min="0" max="1000">
+    <br>
+    <span>Tangent spread: </span>
+    <input id="tangent-spread-slider" type="range" min="0" max="1000">
+    <br>
     <span>Alpha threshold: </span>
     <input id="alpha-threshold-slider" type="range" min="1" max="255">
     <br>
@@ -47,7 +53,7 @@
     <script src="./croquis.js/croquis.js"></script>
     <script>
     // <![CDATA[
-    var w = 300;
+    var w = 400;
     var h = 150;
 
     var croquis = new Croquis();
@@ -58,7 +64,7 @@
     croquis.addLayer();
     croquis.selectLayer(1);
     var brush = new Croquis.Brush();
-    brush.setSize(40);
+    brush.setSize(20);
     brush.setColor('#000');
     brush.setSpacing(0);
     croquis.setTool(brush);
@@ -73,6 +79,8 @@
     var flowSlider = document.getElementById('flow-slider');
     var spacingSlider = document.getElementById('spacing-slider');
     var angleSlider = document.getElementById('angle-slider');
+    var normalSpreadSlider = document.getElementById('normal-spread-slider');
+    var tangentSpreadSlider = document.getElementById('tangent-spread-slider');
     var rotateToDirectionCheckbox = document.getElementById('rotate-to-direction-checkbox');
     var alphaThresholdSlider = document.getElementById('alpha-threshold-slider');
     var simulatePressureCheckbox = document.getElementById('simulate-pressure-checkbox');
@@ -81,6 +89,8 @@
     flowSlider.value = brush.getFlow() * 100;
     spacingSlider.value = brush.getSpacing() * 100;
     angleSlider.value = brush.getAngle();
+    normalSpreadSlider.value = brush.getNormalSpread() * 100;
+    tangentSpreadSlider.value = brush.getTangentSpread() * 100;
     alphaThresholdSlider.value = 0x20;
     simulatePressureCheckbox.checked = true;
     
@@ -100,6 +110,14 @@
     angleSlider.onchange = function () {
       brush.setAngle(angleSlider.value);
       updatePointer();
+      updatePreview();
+    };
+    normalSpreadSlider.onchange = function () {
+      brush.setNormalSpread(normalSpreadSlider.value * 0.01);
+      updatePreview();
+    };
+    tangentSpreadSlider.onchange = function () {
+      brush.setTangentSpread(tangentSpreadSlider.value * 0.01);
       updatePreview();
     };
     rotateToDirectionCheckbox.onchange = function () {
@@ -149,6 +167,7 @@
       var paddedWidth = w - padding * 2;
       var amplitude = halfH - padding;
       var pressure = simulatePressureCheckbox.checked ? 0 : 1;
+      brush.setRandomFunction((new Croquis.Random.LFSR113).get);
       croquis.clearLayer();
       croquis.down(padding, halfH, pressure);
       for (var t = 0; t < 1; t += 0.01) {
