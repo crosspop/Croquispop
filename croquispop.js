@@ -11,7 +11,7 @@ croquis.unlockHistory();
 var brush = new Croquis.Brush();
 brush.setSize(40);
 brush.setColor('#000');
-brush.setSpacing(0);
+brush.setSpacing(0.2);
 
 croquis.setTool(brush);
 croquis.setToolStabilizeLevel(10);
