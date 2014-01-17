@@ -3,9 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Croquispop</title>
-    <link rel="stylesheet" type="text/css" href="./croquispop.css">
-    <link rel="stylesheet" type="text/css"
-          href="http://fonts.googleapis.com/earlyaccess/nanumgothic.css">
+    <link rel="stylesheet" type="text/css" href="./brush-preview.css">
   </head>
   <body>
     <div id="brush-image-shelf">
@@ -17,55 +15,53 @@
       <img src="./img/brush/b4.png" class="brush-image"></img>
       <img src="./img/brush/b5.png" class="brush-image"></img>
     </div>
-    <br>
-    <span>Preview: </span>
-    <div id="canvas-area"></div>
-    <br>
-    <span>Simulate pressure: </span>
+    <hr>
     <input id="simulate-pressure-checkbox" type="checkbox">
+    <span>Simulate Pressure</span>
     <br>
-    <span>Size: </span>
+    <p>Size</p>
     <input id="size-slider" type="range" min="0" max="50">
     <br>
-    <span>Flow: </span>
+    <p>Flow</p>
     <input id="flow-slider" type="range" min="0" max="100">
     <br>
-    <span>Spacing: </span>
+    <p>Spacing</p>
     <input id="spacing-slider" type="range" min="0" max="500">
     <br>
-    <span>Angle: </span>
+    <p>Angle</p>
     <input id="angle-slider" type="range" min="0" max="360">
     <br>
-    <span>Rotate to direction: </span>
     <input id="rotate-to-direction-checkbox" type="checkbox">
+    <span>Rotate To Direction</span>
     <br>
-    <span>Normal spread: </span>
+    <p>Normal Spread</p>
     <input id="normal-spread-slider" type="range" min="0" max="1000">
     <br>
-    <span>Tangent spread: </span>
+    <p>Tangent Spread</p>
     <input id="tangent-spread-slider" type="range" min="0" max="1000">
     <br>
-    <span>Alpha threshold: </span>
+    <div id="canvas-area"></div>
+    <hr>
+    <p>Pointer</p>
+    <div id="pointer-container"></div>
+    <p>Alpha Threshold</p>
     <input id="alpha-threshold-slider" type="range" min="1" max="255">
-    <br>
-    <span>Pointer: </span>
-    <div id="pointer-container" style="display: inline;"></div>
     <script src="./croquis.js/croquis.js"></script>
     <script>
     // <![CDATA[
-    var w = 400;
-    var h = 150;
+    var w = 360;
+    var h = 80;
 
     var croquis = new Croquis();
     croquis.lockHistory(); //not using history
     croquis.setCanvasSize(w, h);
     croquis.addLayer();
-    croquis.fillLayer('#fff');
+    croquis.fillLayer('#4e4e4e');
     croquis.addLayer();
     croquis.selectLayer(1);
     var brush = new Croquis.Brush();
     brush.setSize(20);
-    brush.setColor('#000');
+    brush.setColor('#fff');
     brush.setSpacing(0);
     croquis.setTool(brush);
     croquis.setToolStabilizeLevel(0); //not using stabilizer
@@ -154,7 +150,6 @@
       var alphaThreshold = alphaThresholdSlider.value;
       var pointerImage = Croquis.createBrushPointer(
         brush.getImage(), size, angle, alphaThreshold, true);
-      pointerImage.style.cssText = 'border: solid 1px';
       pointerContainer.innerHTML = '';
       pointerContainer.appendChild(pointerImage);
     }
@@ -163,7 +158,7 @@
       var deg360 = Math.PI * 2;
       var deg180 = Math.PI;
       var halfH = h >> 1;
-      var padding = 50;
+      var padding = 30;
       var paddedWidth = w - padding * 2;
       var amplitude = halfH - padding;
       var pressure = simulatePressureCheckbox.checked ? 0 : 1;
@@ -172,9 +167,9 @@
       croquis.down(padding, halfH, pressure);
       for (var t = 0; t < 1; t += 0.01) {
         var horizontalPos = t * paddedWidth + padding;
-        var verticalPos = Math.sin(deg360 * t) * amplitude + halfH;
+        var verticalPos = -Math.sin(deg360 * t) * amplitude + halfH;
         pressure = simulatePressureCheckbox.checked ?
-                        Math.sin(deg180 * t) : 1;
+                        1 - Math.abs(t * 2 - 1) : 1;
         croquis.move(horizontalPos, verticalPos, pressure);
       }
       croquis.up(w - padding, halfH, pressure);
