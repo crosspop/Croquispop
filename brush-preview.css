@@ -14,9 +14,19 @@ hr {
 
 input[type=range] {
   width: 200px;
+  margin-left: 5px;
 }
 
-#canvas-area > div {
+label {
+  margin-left: 5px;
+}
+
+.indent {
+  margin: 10px;
+}
+
+#canvas-area > div, #pointer-container > canvas {
+  display: inline-block;
   border: solid 1px #383838;
   border-bottom: solid 1px #707070;
 }
@@ -27,16 +37,6 @@ input[type=range] {
   display: inline-block;
   border-radius: 15px;
   background-color: #000;
-}
-
-#pointer-container {
-  -webkit-filter: invert(100%);
-  -moz-filter: invert(100%);
-  -ms-filter: invert(100%);
-}
-
-#pointer-container > canvas {
-  border: solid 1px #c7c7c7;
 }
 
 .brush-image {
@@ -58,8 +58,10 @@ input[type=range] {
 }
 
 p, span {
+  margin: 0;
+  margin-bottom: 6px;
   color: #fff;
-  font-size: 7pt;
+  font-size: 10pt;
   font-family: sans-serif;
-  margin: 2px;
+  -webkit-font-smoothing: antialiased;
 }

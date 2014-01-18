@@ -3,10 +3,11 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Croquispop</title>
+    <link rel="stylesheet" type="text/css" href="./topcoat-desktop-dark.min.css">
     <link rel="stylesheet" type="text/css" href="./brush-preview.css">
   </head>
   <body>
-    <div id="brush-image-shelf">
+    <div id="brush-image-shelf" class="indent">
       <div class="brush-image on" id="circle-brush"></div>
       <img src="./img/brush/b0.png" class="brush-image"></img>
       <img src="./img/brush/b1.png" class="brush-image"></img>
@@ -16,36 +17,44 @@
       <img src="./img/brush/b5.png" class="brush-image"></img>
     </div>
     <hr>
-    <input id="simulate-pressure-checkbox" type="checkbox">
-    <span>Simulate Pressure</span>
-    <br>
-    <p>Size</p>
-    <input id="size-slider" type="range" min="0" max="50">
-    <br>
-    <p>Flow</p>
-    <input id="flow-slider" type="range" min="0" max="100">
-    <br>
-    <p>Spacing</p>
-    <input id="spacing-slider" type="range" min="0" max="500">
-    <br>
-    <p>Angle</p>
-    <input id="angle-slider" type="range" min="0" max="360">
-    <br>
-    <input id="rotate-to-direction-checkbox" type="checkbox">
-    <span>Rotate To Direction</span>
-    <br>
-    <p>Normal Spread</p>
-    <input id="normal-spread-slider" type="range" min="0" max="1000">
-    <br>
-    <p>Tangent Spread</p>
-    <input id="tangent-spread-slider" type="range" min="0" max="1000">
-    <br>
-    <div id="canvas-area"></div>
+    <div class="indent">
+      <p>Size</p>
+      <input id="size-slider" class="topcoat-range" type="range" min="0" max="50">
+      <br>
+      <p>Flow</p>
+      <input id="flow-slider" class="topcoat-range" type="range" min="0" max="100">
+      <br>
+      <p>Spacing</p>
+      <input id="spacing-slider" class="topcoat-range" type="range" min="0" max="500">
+      <br>
+      <p>Angle</p>
+      <input id="angle-slider" class="topcoat-range" type="range" min="0" max="360">
+      <br>
+      <label class="topcoat-checkbox">
+        <input id="rotate-to-direction-checkbox" type="checkbox">
+        <div class="topcoat-checkbox__checkmark"></div>
+        <span>Rotate To Direction</span>
+      </label>
+      <br>
+      <p>Normal Spread</p>
+      <input id="normal-spread-slider" class="topcoat-range" type="range" min="0" max="1000">
+      <br>
+      <p>Tangent Spread</p>
+      <input id="tangent-spread-slider" class="topcoat-range" type="range" min="0" max="1000">
+      <br>
+      <div id="canvas-area"></div>
+      <label class="topcoat-checkbox">
+        <input id="simulate-pressure-checkbox" type="checkbox">
+        <div class="topcoat-checkbox__checkmark"></div>
+        <span>Simulate Pressure</span>
+      </label>
+    </div>
     <hr>
-    <p>Pointer</p>
-    <div id="pointer-container"></div>
-    <p>Alpha Threshold</p>
-    <input id="alpha-threshold-slider" type="range" min="1" max="255">
+    <div class="indent">
+      <p>Alpha Threshold</p>
+      <input id="alpha-threshold-slider" class="topcoat-range" type="range" min="1" max="255">
+      <div id="pointer-container"></div>
+    </div>
     <script src="./croquis.js/croquis.js"></script>
     <script>
     // <![CDATA[
@@ -62,7 +71,8 @@
     var brush = new Croquis.Brush();
     brush.setSize(20);
     brush.setColor('#fff');
-    brush.setSpacing(0);
+    brush.setSpacing(0.25);
+    brush.setFlow(0.7);
     croquis.setTool(brush);
     croquis.setToolStabilizeLevel(0); //not using stabilizer
 
@@ -149,7 +159,7 @@
       var angle = angleSlider.value;
       var alphaThreshold = alphaThresholdSlider.value;
       var pointerImage = Croquis.createBrushPointer(
-        brush.getImage(), size, angle, alphaThreshold, true);
+        brush.getImage(), size, angle, alphaThreshold, true, '#fff');
       pointerContainer.innerHTML = '';
       pointerContainer.appendChild(pointerImage);
     }
