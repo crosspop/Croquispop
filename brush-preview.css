@@ -62,6 +62,6 @@ p, span {
   margin-bottom: 6px;
   color: #fff;
   font-size: 10pt;
-  font-family: sans-serif;
+  font-family: "Source Sans", helvetica, arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
