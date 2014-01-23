@@ -10,3 +10,6 @@
 [submodule "input-range-polyfill"]
 	path = input-range-polyfill
 	url = https://github.com/disjukr/input-range-polyfill.git
+[submodule "topcoat"]
+	path = topcoat
+	url = https://github.com/topcoat/topcoat.git
